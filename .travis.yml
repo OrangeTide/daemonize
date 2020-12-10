@@ -1,0 +1,24 @@
+language: c
+dist: xenial
+script:
+  - |
+    gcc -Wall -W -flto -o daemonize_test daemonize.c -x c - <<EOF
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <unistd.h>
+    #include "daemonize.h"
+    int main(int argc, char *argv[]) {
+    int foreground_mode = 0;
+    int opt;
+    while ((opt = getopt(argc, argv, "f")) != -1) {
+    switch (opt) {
+    case 'f':
+    foreground_mode = 1; // foreground mode
+    break;
+    default:
+    fprintf(stderr, "Usage: %s [-f]\n", argv[0]);
+    exit(1);}}
+    if (!foreground_mode) daemonize();
+    return 0;}
+    EOF
+  - ./daemonize_test
